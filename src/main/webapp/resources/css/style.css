@@ -1,0 +1,22 @@
+#connect-page {
+    margin-top: 1rem;
+    max-width: 720px;
+    padding-top: 20px;
+    border: 1px solid;
+}
+
+#chat-page {
+    margin-top: 1rem;
+    padding-top: 20px;
+    border: 1px solid;
+}
+
+.msg_container_base {
+    min-height: 300px;
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.hidden {
+    display: none;
+}

@@ -1,12 +1,11 @@
 package by.kutsko;
 
-import by.kutsko.model.Message;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import by.kutsko.model.Message;
 import org.slf4j.Logger;
 import static org.slf4j.LoggerFactory.getLogger;
 

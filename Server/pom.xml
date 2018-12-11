@@ -4,35 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>by.kutsko</groupId>
-    <artifactId>WebNetworkChat</artifactId>
-    <version>1.0</version>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>Core</module>
-        <module>Server</module>
-        <module>Client</module>
-    </modules>
-
-    <properties>
-        <java.version>1.8</java.version>
-        <!--Spring-->
-        <spring.version>5.1.2.RELEASE</spring.version>
-        <!--Web-->
-        <javax.servlet>4.0.1</javax.servlet>
-        <!--Jackson-->
-        <jackson-json.version>2.9.7</jackson-json.version>
-        <!-- Logging -->
-        <logback.version>1.2.3</logback.version>
-        <slf4j.version>1.7.25</slf4j.version>
-
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-    </properties>
+    <parent>
+        <groupId>by.kutsko</groupId>
+        <artifactId>WebNetworkChat</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>Server</artifactId>
+    <packaging>war</packaging>
 
     <build>
         <plugins>
@@ -58,8 +36,13 @@
     </build>
 
     <dependencies>
-        <!--Spring-->
         <dependency>
+            <groupId>by.kutsko</groupId>
+            <artifactId>Core</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <!--Spring-->
+<!--        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
@@ -108,7 +91,7 @@
             <version>1.14</version>
         </dependency>
 
-        <!--Web-->
+        &lt;!&ndash;Web&ndash;&gt;
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -128,7 +111,7 @@
         </dependency>
 
 
-        <!--Web Jars-->
+        &lt;!&ndash;Web Jars&ndash;&gt;
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>webjars-locator-core</artifactId>
@@ -153,42 +136,7 @@
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
             <version>3.3.1-1</version>
-        </dependency>
-
-        <!--JSON-->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson-json.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson-json.version}</version>
-        </dependency>
-
-
-        <!-- Logging with SLF4J & LogBack -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!--Tests-->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.3.1</version>
-            <scope>test</scope>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
 </project>

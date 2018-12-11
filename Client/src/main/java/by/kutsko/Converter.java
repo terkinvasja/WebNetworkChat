@@ -1,4 +1,4 @@
-package by.kutsko.console;
+package by.kutsko;
 
 import by.kutsko.model.Message;
 import com.fasterxml.jackson.core.JsonProcessingException;

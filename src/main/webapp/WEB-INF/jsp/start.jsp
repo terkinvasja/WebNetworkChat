@@ -127,15 +127,17 @@
             </div>
         </div>
     </div>
+    <form onsubmit="sendMessageText(); return false;">
     <div class="form-row">
         <div class="input-group mb-3">
             <input id="messageText" type="text" class="form-control" placeholder="Enter text"
                    aria-label="Enter text" aria-describedby="button-send">
             <div class="input-group-append">
-                <button class="btn btn-outline-secondary" id="button-send" onclick="sendMessageText();">Send</button>
+                <button class="btn btn-outline-secondary" id="button-send" >Send</button>
             </div>
         </div>
     </div>
+    </form>
 </div>
 <footer>
 
@@ -207,6 +209,20 @@
         var msg = nickName + ": " + messageText.value;
         stompClient.send("/chatApp/send", {}, JSON.stringify({ 'type': 'TEXT', 'data': msg }));
         document.getElementById('messageText').value = "";
+    }
+    
+    function getChar(event) {
+        if (event.width == null) {
+            if (event.keyCode == 13) {
+                sendMessageText();
+                return false;
+            } else return true;
+        } else {
+            if (event.width == 13) {
+                sendMessageText();
+                return false;
+            } else return true;
+        }
     }
 
     function showResult(message) {

@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class MessageController {
@@ -67,7 +67,7 @@ public class MessageController {
         }
     }
 
-    @RequestMapping("/")
+    @GetMapping("/")
     public String start() {
         return "start";
     }

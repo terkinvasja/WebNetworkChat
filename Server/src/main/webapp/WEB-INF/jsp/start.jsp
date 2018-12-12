@@ -18,7 +18,7 @@
 
 </header>
 <div id="connect-page" class="container">
-    <form>
+    <form id="form-register">
         <div class="form-group row">
             <label for="inputNickName" class="col-sm-2 col-form-label">Nickname</label>
             <div class="col-sm-10">
@@ -64,66 +64,6 @@
         <!-- Content here -->
         <div class="col mb-2">
             <div class="msg_container_base rounded" id="msg_container">
-                <%--<div class="d-flex justify-content-start">
-                    <div class="card w-75 mt-1">
-                        <div class="card-header p-1">
-                            Агент
-                        </div>
-                        <div class="card-body">
-                            Hi
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-end">
-                    <div class="card w-75 mt-1">
-                        <div class="card-header p-1">
-                            Клиент
-                        </div>
-                        <div class="card-body">
-                            Hello
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-start">
-                    <div class="card w-75 mt-1">
-                        <div class="card-header p-1">
-                            Агент
-                        </div>
-                        <div class="card-body">
-                            Hi
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-end">
-                    <div class="card w-75 mt-1">
-                        <div class="card-header p-1">
-                            Клиент
-                        </div>
-                        <div class="card-body">
-                            Hello
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-start">
-                    <div class="card w-75 mt-1">
-                        <div class="card-header p-1">
-                            Агент
-                        </div>
-                        <div class="card-body">
-                            Hi
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex justify-content-end">
-                    <div class="card w-75 mt-1">
-                        <div class="card-header p-1">
-                            Клиент
-                        </div>
-                        <div class="card-body">
-                            Hello
-                        </div>
-                    </div>
-                </div>--%>
             </div>
         </div>
     </div>
@@ -157,10 +97,16 @@
     var nickName = "";
 
     var connectPage = document.getElementById('connect-page');
+    var formRegister = document.getElementById('form-register');
     var chatPage = document.getElementById('chat-page');
     var inputNickName = document.getElementById('inputNickName');
     var msgContainer = document.getElementById('msg_container');
     var messageText = document.getElementById('messageText');
+
+    formRegister.addEventListener("submit", function (e) {
+        e.preventDefault();
+        connect();
+    }, false);
 
     function setConnected(connected) {
         if (connected) {

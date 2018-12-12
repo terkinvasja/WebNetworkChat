@@ -54,24 +54,24 @@ public class Client {
 
                     //Создается объект класса Connection, используя сокет
                     LOG.debug("Create new WebSocket connection");
-                    ListenableFuture<StompSession> f = this.connect();
+                    ListenableFuture<StompSession> f = connect();
                     StompSession stompSession = f.get();
                     LOG.info("Subscribing to greeting topic using session " + stompSession);
-                    this.subscribeGreetings(stompSession);
+                    subscribeGreetings(stompSession);
 
                     LOG.debug("Client. Sending registration data");
                     if (m.group(2).equals("agent")) {
-                        this.sendRegister(stompSession, new Message(MessageType.ADD_AGENT, name));
+                        sendRegister(stompSession, new Message(MessageType.ADD_AGENT, name));
                     } else if (m.group(2).equals("client")) {
-                        this.sendRegister(stompSession, new Message(MessageType.ADD_CLIENT, name));
+                        sendRegister(stompSession, new Message(MessageType.ADD_CLIENT, name));
                     }
 
                     while (true) {
                         if (!(message = consoleHelper.readString()).equals("/leave")) {
-                            this.sendTextMessage(stompSession,name + ": " + message);
+                            sendTextMessage(stompSession,name + ": " + message);
                         } else {
 //                            history.clearHistory();
-                            this.sendMessage(stompSession, new Message(MessageType.LEAVE));
+                            sendMessage(stompSession, new Message(MessageType.LEAVE));
                             stompSession.disconnect();
                             break;
                         }

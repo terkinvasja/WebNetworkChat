@@ -53,6 +53,20 @@ public class MessageController {
         }
     }
 
+    @MessageMapping("/sendConsole")
+    public void sendConsoleMessage(SimpMessageHeaderAccessor sha, Message message) throws Exception {
+
+        String connectionUUID = sha.getUser().getName();
+
+        if (serverCondition.getRooms().containsKey(connectionUUID)) {
+            Room room = serverCondition.getRooms().get(connectionUUID);
+//            room.getConnection().send(new Message(MessageType.TEXT, message.getData()));
+            room.getCompanionConnection().send(new Message(MessageType.TEXT, message.getData()));
+        } else {
+            webSocketService.send(connectionUUID, "Server: Нет свободного агента. Пожалуйста подождите");
+        }
+    }
+
     @RequestMapping("/")
     public String start() {
         return "start";

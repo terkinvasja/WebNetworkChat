@@ -3,10 +3,12 @@ package by.kutsko;
 import by.kutsko.model.Message;
 import by.kutsko.model.MessageType;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -25,27 +27,30 @@ import java.util.regex.Pattern;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Component
 public class Client {
 
-    private static Logger LOG = getLogger(Client.class);
-    private String name;
-    private final Pattern p = Pattern.compile("(/register) (agent|client) (\\w+)");
-    private static String URL = "ws://localhost:8080/ws/";
-    private final static WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+    private ConsoleHelper consoleHelper;
 
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-        Client client = new Client();
-        client.run();
+    private Logger LOG = getLogger(Client.class);
+    private final Pattern p = Pattern.compile("(/register) (agent|client) (\\w+)");
+    private final String URL = "ws://localhost:8080/ws/";
+    private final WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+
+    @Autowired
+    public Client(ConsoleHelper consoleHelper) {
+        this.consoleHelper = consoleHelper;
     }
 
-    private void run() throws ExecutionException, InterruptedException {
+    public void run() throws ExecutionException, InterruptedException {
+
         while (true) {
-            ConsoleHelper.writeMessage("Зарегистрируйтесь");
+            consoleHelper.writeMessage("Зарегистрируйтесь");
             String message;
-            if (!(message = ConsoleHelper.readString()).equals("/exit")) {
+            if (!(message = consoleHelper.readString()).equals("/exit")) {
                 Matcher m = p.matcher(message);
                 if (m.matches()) {
-                    name = m.group(3);
+                    String name = m.group(3);
 
                     //Создается объект класса Connection, используя сокет
                     LOG.debug("Create new WebSocket connection");
@@ -62,7 +67,7 @@ public class Client {
                     }
 
                     while (true) {
-                        if (!(message = ConsoleHelper.readString()).equals("/leave")) {
+                        if (!(message = consoleHelper.readString()).equals("/leave")) {
                             this.sendTextMessage(stompSession,name + ": " + message);
                         } else {
 //                            history.clearHistory();
@@ -72,7 +77,7 @@ public class Client {
                         }
                     }
                 } else {
-                    ConsoleHelper.writeMessage("Некорректно введена команада.");
+                    consoleHelper.writeMessage("Некорректно введена команада.");
                 }
             } else {
                 return;
@@ -80,7 +85,7 @@ public class Client {
         }
     }
 
-    public ListenableFuture<StompSession> connect() {
+    private ListenableFuture<StompSession> connect() {
 
         Transport webSocketTransport = new WebSocketTransport(new StandardWebSocketClient());
         List<Transport> transports = Collections.singletonList(webSocketTransport);
@@ -93,7 +98,7 @@ public class Client {
         return stompClient.connect(URL, headers, new MyHandler(), "localhost", 8080);
     }
 
-    public void subscribeGreetings(StompSession stompSession) throws ExecutionException, InterruptedException {
+    private void subscribeGreetings(StompSession stompSession) throws ExecutionException, InterruptedException {
         stompSession.subscribe("/user/topic/showResult", new StompFrameHandler() {
 
             public Type getPayloadType(StompHeaders stompHeaders) {
@@ -104,19 +109,19 @@ public class Client {
                 Message message = Converter.toJavaObject(new String((byte[]) o));
                 switch (message.getType()) {
                     case TEXT: {
-                        ConsoleHelper.writeMessage(message.getData());
+                        consoleHelper.writeMessage(message.getData());
 //                        history.addText(message.getData());
                         break;
                     }
                     case CHANGE_AGENT: {
-                        ConsoleHelper.writeMessage(message.getData());
+                        consoleHelper.writeMessage(message.getData());
                         /*for (String text : history.getListHistory()) {
                             connection.send(new Message(MessageType.TEXT, text));
                         }*/
                         break;
                     }
                     case LEAVE: {
-                        ConsoleHelper.writeMessage(message.getData());
+                        consoleHelper.writeMessage(message.getData());
                         return;
                     }
                     default: {
@@ -127,17 +132,17 @@ public class Client {
         });
     }
 
-    public void sendRegister(StompSession stompSession, Message message) {
+    private void sendRegister(StompSession stompSession, Message message) {
         stompSession.send("/chatApp/add",
                 Converter.toJSON(message).getBytes());
     }
 
-    public void sendMessage(StompSession stompSession, Message message) {
-        stompSession.send("/chatApp/send",
+    private void sendMessage(StompSession stompSession, Message message) {
+        stompSession.send("/chatApp/sendConsole",
                 Converter.toJSON(message).getBytes());
     }
 
-    public void sendTextMessage(StompSession stompSession, String text) {
+    private void sendTextMessage(StompSession stompSession, String text) {
         sendMessage(stompSession, new Message(MessageType.TEXT, text));
     }
 

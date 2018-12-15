@@ -7,8 +7,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Repository;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Repository
 public class ServerCondition {
     private final Logger LOG = getLogger(ServerCondition.class);
 
@@ -70,20 +73,19 @@ public class ServerCondition {
 
     public synchronized void returnAgent(String clientConnectionUUID) {
         LOG.debug("Server.returnAgent");
-        Connection agentConnection = rooms.get(clientConnectionUUID).getCompanionConnection();
+        Room room = rooms.get(clientConnectionUUID);
+        Connection agentConnection = room.getCompanionConnection();
         LOG.debug(String.format("Client %s end chat. Agent %s return to queue.",
                 clientConnectionUUID, agentConnection.getConnectionUUID()));
-        agentList.add(agentConnection);
-        String clientName = connectionHashMap.get(clientConnectionUUID).getName();
-        connectionHashMap.remove(clientConnectionUUID);
-        rooms.remove(clientConnectionUUID);
-        rooms.remove(agentConnection.getConnectionUUID());
         try {
             agentConnection.send(new Message(MessageType.TEXT,
-                    String.format("Server: Клиент %s закончил чат", clientName)));
+                    String.format("Server: Клиент %s закончил чат", room.getConnection().getName())));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        agentList.add(agentConnection);
+        rooms.remove(clientConnectionUUID);
+        rooms.remove(agentConnection.getConnectionUUID());
         getAgent();
     }
 
@@ -96,14 +98,17 @@ public class ServerCondition {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        rooms.remove(clientConnection.getConnectionUUID());
+        clientList.addFirst(clientConnection);
         rooms.remove(agentConnectionUUID);
-        connectionHashMap.remove(agentConnectionUUID);
-        clientList.addFirst(connectionHashMap.get(clientConnection.getConnectionUUID()));
+        rooms.remove(clientConnection.getConnectionUUID());
         getAgent();
     }
 
     public synchronized void disconnect(String connectionUUID) {
+        Connection connection = connectionHashMap.get(connectionUUID);
+        if (connection != null) {
+            connection.setClosed(true);
+        }
         Room room = rooms.get(connectionUUID);
         if (room != null) {
             if (room.isAgent()) {
@@ -130,7 +135,7 @@ public class ServerCondition {
                 LOG.debug(String.format("searchValidConnection. %s is connected.", connection.getConnectionUUID()));
                 break;
             } else {
-                connectionHashMap.remove(connection.getConnectionUUID());
+                deleteUUID(connection.getConnectionUUID());
                 LOG.debug(String.format("searchValidConnection. %s is closed.", connection.getConnectionUUID()));
                 connection = null;
             }

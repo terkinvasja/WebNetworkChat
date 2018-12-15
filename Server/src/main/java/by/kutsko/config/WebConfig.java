@@ -13,7 +13,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 @Configuration
 @ComponentScan("by.kutsko")
 @EnableWebMvc
-@Import({WebSocketConfig.class})
+//@Import({WebSocketConfig.class})
 public class WebConfig implements WebMvcConfigurer {
 
     @Bean

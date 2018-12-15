@@ -6,14 +6,15 @@ import java.io.IOException;
 
 public interface Connection {
 
-    public void send(Message message) throws IOException;
+    void send(Message message) throws IOException;
 
-    public boolean isClosed();
+    boolean isClosed();
 
+    void setClosed(boolean closed);
 
-    public String getConnectionUUID();
+    String getConnectionUUID();
 
-    public String getName();
+    String getName();
 
-    public void setName(String name);
+    void setName(String name);
 }

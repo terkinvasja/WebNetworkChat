@@ -156,20 +156,6 @@
         stompClient.send("/chatApp/send", {}, JSON.stringify({ 'type': 'TEXT', 'data': msg }));
         document.getElementById('messageText').value = "";
     }
-    
-    function getChar(event) {
-        if (event.width == null) {
-            if (event.keyCode == 13) {
-                sendMessageText();
-                return false;
-            } else return true;
-        } else {
-            if (event.width == 13) {
-                sendMessageText();
-                return false;
-            } else return true;
-        }
-    }
 
     function showResult(message) {
         var p = document.createElement('p');

@@ -17,16 +17,17 @@ public class WebSocketConnection extends AbstractConnection {
     }
 
     @Override
-    public void send(Message message) throws IOException {
+    public synchronized void send(Message message) throws IOException {
         webSocketService.send(getConnectionUUID(), message.getData());
     }
 
     @Override
-    public boolean isClosed() {
+    public synchronized boolean isClosed() {
         return closed;
     }
 
-    public void setClosed(boolean closed) {
+    @Override
+    public synchronized void setClosed(boolean closed) {
         this.closed = closed;
     }
 }

@@ -122,7 +122,7 @@ public class Client {
                     }
                     case LEAVE: {
                         consoleHelper.writeMessage(message.getData());
-                        return;
+                        break;
                     }
                     default: {
 //                        throw new IOException("Unexpected MessageType");

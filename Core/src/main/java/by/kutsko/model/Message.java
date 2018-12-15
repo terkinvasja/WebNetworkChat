@@ -7,8 +7,7 @@ public class Message implements Serializable {
     private String data;
 
     public Message(MessageType type) {
-        this.type = type;
-        this.data = "";
+        this(type, "");
     }
 
     public Message(MessageType type, String data) {

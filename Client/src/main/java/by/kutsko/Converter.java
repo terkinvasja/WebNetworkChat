@@ -1,6 +1,7 @@
 package by.kutsko;
 
 import by.kutsko.model.Message;
+import by.kutsko.model.MessageType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class Converter {
             return mapper.readValue(jsonString, Message.class);
         } catch (IOException e) {
             LOG.debug("", e);
-            return new Message();
+            return new Message(MessageType.TEXT);
         }
     }
 }

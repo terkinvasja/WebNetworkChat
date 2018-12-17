@@ -13,8 +13,4 @@ public interface Connection {
     void setClosed(boolean closed);
 
     String getConnectionUUID();
-
-    String getName();
-
-    void setName(String name);
 }

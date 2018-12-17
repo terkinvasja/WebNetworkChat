@@ -18,7 +18,7 @@ public class WebSocketConnection extends AbstractConnection {
 
     @Override
     public synchronized void send(Message message) throws IOException {
-        webSocketService.send(getConnectionUUID(), message.getData());
+        webSocketService.send(getConnectionUUID(), message);
     }
 
     @Override

@@ -17,7 +17,7 @@ public class Room {
         return connection;
     }
 
-    public Connection getCompanionConnection() {
+    public Connection getCompanionConnection(int channelId) {
         return companionConnection;
     }
 

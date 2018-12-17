@@ -6,6 +6,10 @@ public class Message implements Serializable {
     private MessageType type;
     private String data;
 
+    public Message() {
+        this(MessageType.TEXT);
+    }
+
     public Message(MessageType type) {
         this(type, "");
     }

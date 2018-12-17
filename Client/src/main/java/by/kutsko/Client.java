@@ -1,6 +1,7 @@
 package by.kutsko;
 
 import by.kutsko.model.Message;
+import by.kutsko.model.MessageToUser;
 import by.kutsko.model.MessageType;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +62,9 @@ public class Client {
 
                     LOG.debug("Client. Sending registration data");
                     if (m.group(2).equals("agent")) {
-                        sendRegister(stompSession, new Message(MessageType.ADD_AGENT, name));
+                        sendRegister(stompSession, new Message(MessageType.ADD_AGENT, "1"));
                     } else if (m.group(2).equals("client")) {
-                        sendRegister(stompSession, new Message(MessageType.ADD_CLIENT, name));
+                        sendRegister(stompSession, new Message(MessageType.ADD_CLIENT, "1"));
                     }
 
                     while (true) {
@@ -106,7 +107,7 @@ public class Client {
             }
 
             public void handleFrame(StompHeaders stompHeaders, Object o) {
-                Message message = Converter.toJavaObject(new String((byte[]) o));
+                Message message = Converter.toJavaObject(new String((byte[]) o)).getMessage();
                 switch (message.getType()) {
                     case TEXT: {
                         consoleHelper.writeMessage(message.getData());
@@ -134,12 +135,12 @@ public class Client {
 
     private void sendRegister(StompSession stompSession, Message message) {
         stompSession.send("/chatApp/add",
-                Converter.toJSON(message).getBytes());
+                Converter.toJSON(new MessageToUser(0, message)).getBytes());
     }
 
     private void sendMessage(StompSession stompSession, Message message) {
         stompSession.send("/chatApp/sendConsole",
-                Converter.toJSON(message).getBytes());
+                Converter.toJSON(new MessageToUser(0, message)).getBytes());
     }
 
     private void sendTextMessage(StompSession stompSession, String text) {

@@ -15,28 +15,28 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class ServerCondition {
     private final Logger LOG = getLogger(ServerCondition.class);
 
-    private final LinkedList<Connection> agentList = new LinkedList<>();
-    private final LinkedList<Connection> clientList = new LinkedList<>();
-    private final HashMap<String, Connection> connectionHashMap = new HashMap<>();
+    private final LinkedList<User> agentList = new LinkedList<>();
+    private final LinkedList<User> clientList = new LinkedList<>();
+    private final HashMap<String, User> userMap = new HashMap<>();
     private final HashMap<String, Room> rooms = new HashMap<>();
 
-    public void addAgent(Connection connection) {
+    public void addAgent(User user) {
         synchronized (agentList) {
-            agentList.add(connection);
-            addConnection(connection);
+            agentList.add(user);
+            addUser(user);
         }
     }
 
-    public void addClient(Connection connection) {
+    public void addClient(User user) {
         synchronized (clientList) {
-            clientList.add(connection);
-            addConnection(connection);
+            clientList.add(user);
+            addUser(user);
         }
     }
 
-    private void addConnection(Connection connection) {
-        synchronized (connectionHashMap) {
-            connectionHashMap.put(connection.getConnectionUUID(), connection);
+    private void addUser(User user) {
+        synchronized (userMap) {
+            userMap.put(user.getConnection().getConnectionUUID(), user);
         }
     }
 
@@ -53,10 +53,11 @@ public class ServerCondition {
             LOG.debug(String.format("%s and %s start chat.",
                     agentConnection.getConnectionUUID(), clientConnection.getConnectionUUID()));
             try {
-                agentConnection.send(new Message(MessageType.TEXT,
-                        String.format("Server: Клиент %s присоеденился к чату", clientConnection.getName())));
-                clientConnection.send(new Message(MessageType.CHANGE_AGENT,
-                        "Server: Ваш агент " + agentConnection.getName()));
+                agentConnection.send(new Message(MessageType.ACCEPTED, clientConnection.getConnectionUUID()));
+                agentConnection.send(new Message(MessageType.TEXT, "Server: Клиент присоеденился к чату"));
+
+                clientConnection.send(new Message(MessageType.ACCEPTED, agentConnection.getConnectionUUID()));
+                clientConnection.send(new Message(MessageType.CHANGE_AGENT, "Server: Агент присоеденился к чату"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -78,8 +79,7 @@ public class ServerCondition {
         LOG.debug(String.format("Client %s end chat. Agent %s return to queue.",
                 clientConnectionUUID, agentConnection.getConnectionUUID()));
         try {
-            agentConnection.send(new Message(MessageType.TEXT,
-                    String.format("Server: Клиент %s закончил чат", room.getConnection().getName())));
+            agentConnection.send(new Message(MessageType.TEXT, "Server: Клиент закончил чат"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -141,6 +141,10 @@ public class ServerCondition {
             }
         }
         return connection;
+    }
+
+    public HashMap<String, User> getUserMap() {
+        return userMap;
     }
 
     public HashMap<String, Room> getRooms() {

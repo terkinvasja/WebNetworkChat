@@ -5,7 +5,6 @@ import by.kutsko.model.Message;
 import by.kutsko.model.MessageToUser;
 import by.kutsko.model.MessageType;
 import by.kutsko.server.Companion;
-import by.kutsko.server.Room;
 import by.kutsko.server.ServerCondition;
 import by.kutsko.server.User;
 import by.kutsko.service.WebSocketService;

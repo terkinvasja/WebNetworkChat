@@ -1,12 +1,15 @@
 package by.kutsko.server;
 
-import by.kutsko.Connection;
 import by.kutsko.model.Message;
+import by.kutsko.model.MessageToUser;
 import by.kutsko.model.MessageType;
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.LinkedList;
+
+import by.kutsko.service.WebSocketService;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -14,6 +17,9 @@ import static org.slf4j.LoggerFactory.getLogger;
 @Repository
 public class ServerCondition {
     private final Logger LOG = getLogger(ServerCondition.class);
+
+    @Autowired
+    private WebSocketService webSocketService;
 
     private final LinkedList<User> agentList = new LinkedList<>();
     private final LinkedList<User> clientList = new LinkedList<>();
@@ -41,38 +47,38 @@ public class ServerCondition {
     }
 
     public synchronized void getAgent() {
-        Connection agentConnection;
-        Connection clientConnection;
+        User agent;
+        User client;
 
-        agentConnection = searchValidConnection(agentList);
-        clientConnection = searchValidConnection(clientList);
+        agent = searchValidConnection(agentList);
+        client = searchValidConnection(clientList);
 
-        if ((agentConnection != null) && (clientConnection != null)) {
-            rooms.put(agentConnection.getConnectionUUID(), new Room(agentConnection, clientConnection, true));
-            rooms.put(clientConnection.getConnectionUUID(), new Room(clientConnection, agentConnection, false));
+        if ((agent != null) && (client != null)) {
+            Companion agentFreeChanel = agent.getCompanionChannel();
+            Companion clientFreeChanel = client.getCompanionChannel();
+            agent.addCompanion(agentFreeChanel.getChannelId(), clientFreeChanel);
+            client.addCompanion(clientFreeChanel.getChannelId(), agentFreeChanel);
             LOG.debug(String.format("%s and %s start chat.",
-                    agentConnection.getConnectionUUID(), clientConnection.getConnectionUUID()));
-            try {
-                agentConnection.send(new Message(MessageType.ACCEPTED, clientConnection.getConnectionUUID()));
-                agentConnection.send(new Message(MessageType.TEXT, "Server: Клиент присоеденился к чату"));
+                    agent.getConnection().getConnectionUUID(), client.getConnection().getConnectionUUID()));
 
-                clientConnection.send(new Message(MessageType.ACCEPTED, agentConnection.getConnectionUUID()));
-                clientConnection.send(new Message(MessageType.CHANGE_AGENT, "Server: Агент присоеденился к чату"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (agentConnection != null) {
-            LOG.debug(String.format("Agent %s return to list.", agentConnection.getConnectionUUID()));
-            agentList.addFirst(agentConnection);
-        } else if (clientConnection != null) {
-            LOG.debug(String.format("Client %s return to list.", clientConnection.getConnectionUUID()));
-            clientList.addFirst(clientConnection);
+            webSocketService.send(agent.getConnection().getConnectionUUID(),
+                    new MessageToUser(agentFreeChanel.getChannelId(),
+                            new Message(MessageType.TEXT, "Server: Клиент присоеденился к чату")));
+            webSocketService.send(client.getConnection().getConnectionUUID(),
+                    new MessageToUser(clientFreeChanel.getChannelId(),
+                            new Message(MessageType.CHANGE_AGENT, "Server: Агент присоеденился к чату")));
+        } else if (agent != null) {
+            LOG.debug(String.format("Agent %s return to list.", agent.getConnection().getConnectionUUID()));
+            agentList.addFirst(agent);
+        } else if (client != null) {
+            LOG.debug(String.format("Client %s return to list.", client.getConnection().getConnectionUUID()));
+            clientList.addFirst(client);
         }
         LOG.debug(String.format("Server.getAgent clientList=%s, agentList=%s",
                 clientList.size(), agentList.size()));
     }
-
-    public synchronized void returnAgent(String clientConnectionUUID) {
+    //TODO
+/*    public synchronized void returnAgent(String clientConnectionUUID) {
         LOG.debug("Server.returnAgent");
         Room room = rooms.get(clientConnectionUUID);
         Connection agentConnection = room.getCompanionConnection();
@@ -102,10 +108,18 @@ public class ServerCondition {
         rooms.remove(agentConnectionUUID);
         rooms.remove(clientConnection.getConnectionUUID());
         getAgent();
-    }
+    }*/
 
     public synchronized void disconnect(String connectionUUID) {
-        Connection connection = connectionHashMap.get(connectionUUID);
+        User user = userMap.get(connectionUUID);
+        if (user != null) {
+            user.getConnection().setClosed(true);
+
+            if (user.getFreeChannels() != user.getNumberOfChannels()) {
+                //TODO
+            }
+        }
+/*        Connection connection = connectionHashMap.get(connectionUUID);
         if (connection != null) {
             connection.setClosed(true);
         }
@@ -116,31 +130,34 @@ public class ServerCondition {
             } else {
                 returnAgent(room.getConnection().getConnectionUUID());
             }
-        }
+        }*/
     }
 
     public synchronized void deleteUUID(String connectionUUID) {
         rooms.remove(connectionUUID);
-        connectionHashMap.remove(connectionUUID);
+        userMap.remove(connectionUUID);
         LOG.debug(String.format("Server.deleteUUID clientList=%s, agentList=%s",
                 clientList.size(), agentList.size()));
     }
 
-    private Connection searchValidConnection(LinkedList<Connection> linkedList) {
-        Connection connection = null;
-        while (!linkedList.isEmpty()) {
-            connection = linkedList.poll();
+    private User searchValidConnection(LinkedList<User> userList) {
+        User user = null;
+        while (!userList.isEmpty()) {
+            user = userList.poll();
 //            if (connection == null) break;
-            if (!connection.isClosed()) {
-                LOG.debug(String.format("searchValidConnection. %s is connected.", connection.getConnectionUUID()));
+            if (!user.getConnection().isClosed()) {
+                LOG.debug(String.format("searchValidConnection. %s is connected.",
+                        user.getConnection().getConnectionUUID()));
                 break;
             } else {
-                deleteUUID(connection.getConnectionUUID());
-                LOG.debug(String.format("searchValidConnection. %s is closed.", connection.getConnectionUUID()));
-                connection = null;
+                //TODO удалить и у компаньонов
+                deleteUUID(user.getConnection().getConnectionUUID());
+                LOG.debug(String.format("searchValidConnection. %s is closed.",
+                        user.getConnection().getConnectionUUID()));
+                user = null;
             }
         }
-        return connection;
+        return user;
     }
 
     public HashMap<String, User> getUserMap() {

@@ -72,7 +72,7 @@ public class Client {
                             sendTextMessage(stompSession,name + ": " + message);
                         } else {
 //                            history.clearHistory();
-                            sendMessage(stompSession, new Message(MessageType.LEAVE));
+//                            sendMessage(stompSession, new Message(MessageType.LEAVE));
                             stompSession.disconnect();
                             break;
                         }

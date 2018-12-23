@@ -50,6 +50,20 @@ public class User {
         return null;
     }
 
+    public List<Companion> disconnect() {
+        List<Companion> list = new ArrayList<>(numberOfChannels);
+        connection.setClosed(true);
+        if (freeChannels != numberOfChannels) {
+            for (Companion c : companions) {
+                if (c != null) {
+                    //TODO
+                    list.add(c);
+                }
+            }
+        }
+        return list;
+    }
+
     public void removeCompanion(String connectionUUID) {
         Companion companion;
         for (int i = 0; i < numberOfChannels; i++ ) {

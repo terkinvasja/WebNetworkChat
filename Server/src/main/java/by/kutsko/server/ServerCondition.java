@@ -4,8 +4,10 @@ import by.kutsko.model.Message;
 import by.kutsko.model.MessageToUser;
 import by.kutsko.model.MessageType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import by.kutsko.service.WebSocketService;
 import org.slf4j.Logger;
@@ -113,10 +115,10 @@ public class ServerCondition {
     public synchronized void disconnect(String connectionUUID) {
         User user = userMap.get(connectionUUID);
         if (user != null) {
-            user.getConnection().setClosed(true);
-
-            if (user.getFreeChannels() != user.getNumberOfChannels()) {
-                //TODO
+            for (Companion companion : user.disconnect()) {
+                webSocketService.send(companion.getConnection().getConnectionUUID(),
+                        new MessageToUser(companion.getChannelId(),
+                                new Message(MessageType.TEXT, "Companion disconnected.")));
             }
         }
 /*        Connection connection = connectionHashMap.get(connectionUUID);
@@ -150,7 +152,6 @@ public class ServerCondition {
                         user.getConnection().getConnectionUUID()));
                 break;
             } else {
-                //TODO удалить и у компаньонов
                 deleteUUID(user.getConnection().getConnectionUUID());
                 LOG.debug(String.format("searchValidConnection. %s is closed.",
                         user.getConnection().getConnectionUUID()));

@@ -116,11 +116,24 @@ public class ServerCondition {
         User user = userMap.get(connectionUUID);
         if (user != null) {
             for (Companion companion : user.disconnect()) {
+                Message message;
+                if (user.isAgent()) {
+                    message = new Message(MessageType.TEXT,
+                            "Server: Агент разорвал соединение. Подождите пока подключится новый агент.");
+                    clientList.addFirst(userMap.get(companion.getConnection().getConnectionUUID()));
+
+                } else {
+                    message = new Message(MessageType.TEXT,
+                            "Server: Клиент закончил чат");
+                    agentList.add(userMap.get(companion.getConnection().getConnectionUUID()));
+                }
                 webSocketService.send(companion.getConnection().getConnectionUUID(),
-                        new MessageToUser(companion.getChannelId(),
-                                new Message(MessageType.TEXT, "Companion disconnected.")));
+                        new MessageToUser(companion.getChannelId(), message));
+                userMap.get(companion.getConnection().getConnectionUUID()).removeCompanion(connectionUUID);
+                getAgent();
             }
         }
+
 /*        Connection connection = connectionHashMap.get(connectionUUID);
         if (connection != null) {
             connection.setClosed(true);

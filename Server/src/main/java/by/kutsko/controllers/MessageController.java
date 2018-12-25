@@ -35,8 +35,10 @@ public class MessageController {
 
         if (message.getType().equals(MessageType.ADD_AGENT)) {
             serverCondition.addAgent(user);
+            user.setAgent(true);
         } else if (message.getType().equals(MessageType.ADD_CLIENT)) {
             serverCondition.addClient(user);
+            user.setAgent(false);
         }
 
         serverCondition.getAgent();

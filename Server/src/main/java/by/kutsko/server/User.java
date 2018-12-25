@@ -11,6 +11,7 @@ public class User {
     private final int numberOfChannels;
     private int freeChannels;
     private List<Companion> companions;
+    private boolean agent;
 
     public User(Connection connection, int numberOfChannels) {
         this.connection = connection;
@@ -33,6 +34,14 @@ public class User {
 
     public int getFreeChannels() {
         return freeChannels;
+    }
+
+    public boolean isAgent() {
+        return agent;
+    }
+
+    public void setAgent(boolean agent) {
+        this.agent = agent;
     }
 
     public void addCompanion(int channelId, Companion companion) {

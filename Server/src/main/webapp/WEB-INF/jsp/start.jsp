@@ -126,7 +126,7 @@
             setConnected(true);
             console.log('Connected: ' + frame);
             stompClient.subscribe('/user/topic/showResult', function(calResult){
-                showResult(JSON.parse(calResult.body).data);
+                showResult(JSON.parse(calResult.body).message.data);
             });
             sendMessageDataUser();
         });
@@ -148,12 +148,16 @@
             messageType = "ADD_CLIENT";
             document.getElementById('nickName').innerHTML = "Client: " + nickName;
         }
-        stompClient.send("/chatApp/add", {}, JSON.stringify({ 'type': messageType, 'data': nickName }));
+        stompClient.send("/chatApp/add", {}, JSON.stringify(
+            {'chanelId': '0', 'message':
+                    {'type': messageType, 'data': '1'}} ));
     }
 
     function sendMessageText() {
         var msg = nickName + ": " + messageText.value;
-        stompClient.send("/chatApp/send", {}, JSON.stringify({ 'type': 'TEXT', 'data': msg }));
+        stompClient.send("/chatApp/send", {}, JSON.stringify(
+            {'chanelId': '0', 'message':
+                    {'type': 'TEXT', 'data': msg}} ));
         document.getElementById('messageText').value = "";
     }
 

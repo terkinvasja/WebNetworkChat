@@ -49,19 +49,21 @@ public class ServerCondition {
     }
 
     public synchronized void getAgent() {
-        User agent;
-        User client;
-
-        agent = searchValidConnection(agentList);
-        client = searchValidConnection(clientList);
+        User agent = searchValidConnection(agentList);
+        User client = searchValidConnection(clientList);
 
         if ((agent != null) && (client != null)) {
+            LOG.debug(String.format("%s and %s start chat.",
+                    agent.getConnection().getConnectionUUID(), client.getConnection().getConnectionUUID()));
+
             Companion agentFreeChanel = agent.getCompanionChannel();
             Companion clientFreeChanel = client.getCompanionChannel();
             agent.addCompanion(agentFreeChanel.getChannelId(), clientFreeChanel);
             client.addCompanion(clientFreeChanel.getChannelId(), agentFreeChanel);
-            LOG.debug(String.format("%s and %s start chat.",
-                    agent.getConnection().getConnectionUUID(), client.getConnection().getConnectionUUID()));
+
+            if (agent.getFreeChannels() != 0) {
+                agentList.add(agent);
+            }
 
             webSocketService.send(agent.getConnection().getConnectionUUID(),
                     new MessageToUser(agentFreeChanel.getChannelId(),

@@ -20,15 +20,15 @@
 <div id="connect-page" class="container">
     <form id="form-register">
         <div class="form-group row">
-            <label for="inputNickName" class="col-sm-2 col-form-label">Nickname</label>
-            <div class="col-sm-10">
+            <label for="inputNickName" class="col-sm-3 col-form-label">Nickname</label>
+            <div class="col-sm-9">
                 <input type="text" class="form-control" id="inputNickName" placeholder="Nickname">
             </div>
         </div>
         <fieldset class="form-group">
             <div class="row">
-                <legend class="col-form-label col-sm-2 pt-0">Type</legend>
-                <div class="col-sm-10">
+                <legend class="col-form-label col-sm-3 pt-0">Type</legend>
+                <div class="col-sm-9">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="typeClient" id="agentRadio" value="0" checked>
                         <label class="form-check-label" for="agentRadio">
@@ -44,6 +44,18 @@
                 </div>
             </div>
         </fieldset>
+        <div class="form-group row">
+            <label for="numberOfChannels" class="col-sm-3 col-form-label">Number of Channels</label>
+            <div class="col-sm-9">
+                <select class="form-control" id="numberOfChannels">
+                    <option selected>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                </select>
+            </div>
+        </div>
     </form>
     <div class="form-group row">
         <div class="col-sm-10">
@@ -140,17 +152,21 @@
 
     function sendMessageDataUser() {
         var messageType = "";
+        var numberOfChannels = 1;
         nickName = inputNickName.value;
         if (document.getElementById('agentRadio').checked) {
             messageType = "ADD_AGENT";
             document.getElementById('nickName').innerHTML = "Agent: " + nickName;
+            var select = document.getElementById('numberOfChannels');
+            numberOfChannels = select.options[select.selectedIndex].value;
         } else {
             messageType = "ADD_CLIENT";
             document.getElementById('nickName').innerHTML = "Client: " + nickName;
+            numberOfChannels = 1;
         }
         stompClient.send("/chatApp/add", {}, JSON.stringify(
             {'chanelId': '0', 'message':
-                    {'type': messageType, 'data': '1'}} ));
+                    {'type': messageType, 'data': numberOfChannels}} ));
     }
 
     function sendMessageText() {

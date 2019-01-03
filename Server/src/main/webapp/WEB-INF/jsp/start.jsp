@@ -138,7 +138,7 @@
             setConnected(true);
             console.log('Connected: ' + frame);
             stompClient.subscribe('/user/topic/showResult', function(calResult){
-                showResult(JSON.parse(calResult.body).message.data);
+                showResult(JSON.parse(calResult.body));
             });
             sendMessageDataUser();
         });
@@ -177,10 +177,10 @@
         document.getElementById('messageText').value = "";
     }
 
-    function showResult(message) {
+    function showResult(messageToUser) {
         var p = document.createElement('p');
         p.style.wordWrap = 'break-word';
-        p.appendChild(document.createTextNode(message));
+        p.appendChild(document.createTextNode(messageToUser.message.data));
         msgContainer.appendChild(p);
     }
 </script>
